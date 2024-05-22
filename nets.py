@@ -159,7 +159,7 @@ class CIFAR10_Net(nn.Module):
         x = F.relu(F.max_pool2d(self.conv3(x), 2))
         x = x.view(-1, 1024)
         e1 = F.relu(self.fc1(x))
-        x = F.dropout(e1, training=self.training)
+        x = F.dropout(e1, training=self.training, p=0.9)
         x = self.fc2(x)
         return x, e1
 
