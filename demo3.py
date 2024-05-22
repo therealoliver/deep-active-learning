@@ -132,3 +132,6 @@ if __name__ == '__main__':
 	# 全量学习
 	for n_init_labeled in range(1000, 21000, 1000):
 		pool.apply_async(full_train, args=(n_init_labeled,), error_callback=err_call_back, callback=call_back)
+
+	pool.close()
+	pool.join()
