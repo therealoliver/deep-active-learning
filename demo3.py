@@ -18,7 +18,7 @@ def active_train(strategy_name, n_init_labeled):
 	args = parser.parse_args()
 	pprint(vars(args))
 
-	with open(strategy_name + '.txt', 'a') as f:
+	with open(strategy_name + f'-{n_init_labeled}.txt', 'a') as f:
 		f.write(f'{n_init_labeled}\n')
 
 	# fix random seed
@@ -48,7 +48,7 @@ def active_train(strategy_name, n_init_labeled):
 	preds = strategy.predict(dataset.get_test_data())
 	print(f"Round 0 test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
-	with open(strategy_name + '.txt', 'a') as f:
+	with open(strategy_name + f'-{n_init_labeled}.txt', 'a') as f:
 		f.write(f'{max_acc}\t')
 
 	for rd in range(1, args.n_round + 1):
@@ -65,10 +65,10 @@ def active_train(strategy_name, n_init_labeled):
 		preds = strategy.predict(dataset.get_test_data())
 		print(f"Round {rd} test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
-		with open(strategy_name + '.txt', 'a') as f:
+		with open(strategy_name + f'-{n_init_labeled}.txt', 'a') as f:
 			f.write(f'{max_acc}\t')
 
-	with open(strategy_name + '.txt', 'a') as f:
+	with open(strategy_name + f'-{n_init_labeled}.txt', 'a') as f:
 		f.write('\n')
 
 
@@ -109,8 +109,16 @@ def full_train(n_init_labeled):
 	preds = strategy.predict(dataset.get_test_data())
 	print(f"test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
-	with open('full_train.txt', 'a') as f:
-		f.write(f'{n_init_labeled}\t{max_acc}\n')
+	with open(f'full_train-{n_init_labeled}.txt', 'a') as f:
+		f.write(f'{max_acc}\n')
+
+
+def call_back(res):
+	print(res)
+
+
+def err_call_back(err):
+	print(f'error：{str(err)}')
 
 
 if __name__ == '__main__':
@@ -119,10 +127,8 @@ if __name__ == '__main__':
 	# 增量学习
 	for strategy_name in ["RandomSampling", "LeastConfidence", "MarginSampling", "EntropySampling"]:
 		for n_init_labeled in [1000, 2000, 5000, 10000]:
-			pool.apply_async(active_train, args=(strategy_name, n_init_labeled), error_callback=lambda x: print('错误', x))
+			pool.apply_async(active_train, args=(strategy_name, n_init_labeled), error_callback=err_call_back, callback=call_back)
 
 	# 全量学习
 	for n_init_labeled in range(1000, 21000, 1000):
-		pool.apply_async(full_train, args=(n_init_labeled,), error_callback=lambda x: print('错误', x))
-
-	pool.close()
+		pool.apply_async(full_train, args=(n_init_labeled,), error_callback=err_call_back, callback=call_back)
