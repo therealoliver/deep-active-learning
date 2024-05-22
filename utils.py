@@ -24,8 +24,8 @@ params = {'MNIST':
                'optimizer_args':{'lr': 0.01, 'momentum': 0.5}},
           'CIFAR10':
               {'n_epoch': 20, 
-               'train_args':{'batch_size': 64, 'num_workers': 1},
-               'test_args':{'batch_size': 1000, 'num_workers': 1},
+               'train_args':{'batch_size': 64, 'num_workers': 0},
+               'test_args':{'batch_size': 1000, 'num_workers': 0},
                # 'optimizer_args':{'lr': 0.05, 'momentum': 0.3},
                'optimizer_args':{'lr': 0.01, 'momentum': 0.9}
                }
