@@ -74,7 +74,7 @@ from pprint import pprint
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--seed', type=int, default=1, help="random seed")
-	parser.add_argument('--n_init_labeled', type=int, default=20000, help="number of init labeled samples")
+	parser.add_argument('--n_init_labeled', type=int, default=1000, help="number of init labeled samples")
 	parser.add_argument('--dataset_name', type=str, default="CIFAR10", help="dataset")
 	parser.add_argument('--strategy_name', type=str, default="RandomSampling", help="query strategy")
 
@@ -103,6 +103,7 @@ if __name__ == '__main__':
 	print()
 
 	# accuracy
-	strategy.train()
+	max_acc = strategy.train()
 	preds = strategy.predict(dataset.get_test_data())
 	print(f"testing accuracy: {dataset.cal_test_acc(preds)}")
+	print(f'max accuracy: {max_acc}')

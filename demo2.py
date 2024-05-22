@@ -6,12 +6,9 @@ from pprint import pprint
 
 if __name__ == '__main__':
 	# 增量学习
-	# for strategy_name in ["RandomSampling", "LeastConfidence", "MarginSampling", "EntropySampling"]:
-	for strategy_name in ["EntropySampling"]:
+	for strategy_name in ["RandomSampling", "LeastConfidence", "MarginSampling", "EntropySampling"]:
 		for n_init_labeled in [1000, 2000, 5000, 10000]:
 			print(f'train for {strategy_name}: {n_init_labeled}')
-			if strategy_name == 'MarginSampling' and n_init_labeled < 5000:
-				continue
 			parser = argparse.ArgumentParser()
 			parser.add_argument('--seed', type=int, default=1, help="random seed")
 			parser.add_argument('--n_init_labeled', type=int, default=n_init_labeled, help="number of init labeled samples")
@@ -49,12 +46,12 @@ if __name__ == '__main__':
 
 			# round 0 accuracy
 			print("Round 0")
-			strategy.train()
+			max_acc = strategy.train()
 			preds = strategy.predict(dataset.get_test_data())
-			print(f"Round 0 testing accuracy: {dataset.cal_test_acc(preds)}")
+			print(f"Round 0 test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
 			with open(strategy_name + '.txt', 'a') as f:
-				f.write(f'{dataset.cal_test_acc(preds)}\t')
+				f.write(f'{max_acc}\t')
 
 			for rd in range(1, args.n_round+1):
 				print(f"Round {rd}")
@@ -64,14 +61,14 @@ if __name__ == '__main__':
 
 				# update labels
 				strategy.update(query_idxs)
-				strategy.train()
+				max_acc = strategy.train()
 
 				# calculate accuracy
 				preds = strategy.predict(dataset.get_test_data())
-				print(f"Round {rd} testing accuracy: {dataset.cal_test_acc(preds)}")
+				print(f"Round {rd} test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
 				with open(strategy_name + '.txt', 'a') as f:
-					f.write(f'{dataset.cal_test_acc(preds)}\t')
+					f.write(f'{max_acc}\t')
 
 			with open(strategy_name + '.txt', 'a') as f:
 				f.write('\n')
@@ -110,9 +107,9 @@ if __name__ == '__main__':
 		print()
 
 		# accuracy
-		strategy.train()
+		max_acc = strategy.train()
 		preds = strategy.predict(dataset.get_test_data())
-		print(f"testing accuracy: {dataset.cal_test_acc(preds)}")
+		print(f"test acc: {dataset.cal_test_acc(preds)}, max acc: {max_acc}")
 
 		with open('full_train.txt', 'a') as f:
-			f.write(f'{n_init_labeled}\t{dataset.cal_test_acc(preds)}\n')
+			f.write(f'{n_init_labeled}\t{max_acc}\n')

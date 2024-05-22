@@ -19,7 +19,7 @@ class Strategy:
 
     def train(self):
         labeled_idxs, labeled_data = self.dataset.get_labeled_data()
-        self.net.train(labeled_data, self.dataset)
+        return self.net.train(labeled_data, self.dataset)
 
     def predict(self, data):
         preds = self.net.predict(data)

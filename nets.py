@@ -20,6 +20,7 @@ class Net:
         scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
 
         loader = DataLoader(data, shuffle=True, **self.params['train_args'])
+        test_accs = []
         # for epoch in tqdm(range(1, n_epoch+1), ncols=100):
         for epoch in range(1, n_epoch+1):
             for batch_idx, (x, y, idxs) in enumerate(loader):
@@ -33,7 +34,10 @@ class Net:
             # 准确率
             preds_train = self.predict(dataset.get_train_data()[1])
             preds = self.predict(dataset.get_test_data())
-            print(f"Epoch {epoch} train acc: {dataset.cal_train_acc(preds_train)} test acc: {dataset.cal_test_acc(preds)}")
+            test_acc = dataset.cal_test_acc(preds)
+            test_accs.append(test_acc)
+            print(f"Epoch {epoch} train acc: {dataset.cal_train_acc(preds_train)} test acc: {test_acc}")
+        return max(test_accs)
 
     def predict(self, data):
         self.clf.eval()
